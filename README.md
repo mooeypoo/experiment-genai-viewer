@@ -1,135 +1,129 @@
-# experiment-genai-steps
+# GenAI Experiment Viewer
 
-A small GenAI incremental localization experiment built with Vue 3 and Vite,
-developed across multiple steps driven by an AI coding agent.
+A standalone viewer for GenAI incremental experiments (e.g. Cursor/Copilot). It builds a full static site (viewer UI + step artifacts + metadata) suitable for GitHub Pages. The repo can be used standalone or vendored into consumer repos via **git subtree**.
 
-The app itself is intentionally minimal: a single social-style post with
-comments and a list of users. All data lives in memory and resets on page
-refresh. The repository is an experiment in observing how AI-assisted
-development evolves a codebase over many guided steps.
+- **Tech:** Vue 3 (Composition API), Vite, Vuetify. JavaScript only (no TypeScript).
+- **Output:** Static site under `_site/` (or `viewer/_site/` when vendored). GitHub Pages should publish this folder, not the raw SPA `dist/`.
 
 ---
 
-## Running locally (the Vue app)
+## 1. Overview
 
-```bash
-npm install
-npm run dev
-```
+The viewer is a small Vue 3 SPA that loads:
 
-Open the URL printed by Vite (usually `http://localhost:5173`).
+- `./steps.json` — list of steps and metadata
+- `./viewer-config.json` — branding/title/links
+- `./step-XX/` — per-step builds (`index.html`, `notes.html`, `prompt.html` when present)
 
-### Production build
+The **full static site** is produced by `npm run build:pages`, which:
 
-```bash
-npm run build
-npm run preview   # serves the built output locally
-```
-
-The production build outputs static files to `dist/`. It can be deployed to
-any static hosting provider with no server-side requirements.
+1. Builds the viewer app into `_site/`
+2. Writes `viewer-config.json` and `steps.json` into `_site/`
+3. Either builds real step artifacts from the repo (tags or `step-*` folders) or generates mock steps in standalone mode
 
 ---
 
-## Step viewer and build pipeline
+## 2. Standalone quick start
 
-A **standalone viewer** and build pipeline live under `viewer/`. The viewer is a Vue 3 app that lists steps, shows each step’s app in an iframe, and displays docs (notes/prompt) in a side panel. It can be extracted into its own repo and vendored back via git subtree.
-
-### Build and preview
+**Install:**
 
 ```bash
-npm run build:pages    # generates site/ at repo root
-npm run preview:pages  # serves site/ (e.g. npx serve site)
+npm ci
+npm ci --prefix viewer-app
 ```
 
-After `build:pages`, open the URL from `preview:pages` (e.g. `http://localhost:3000`). Use **hash routing**: `/#/` (home), `/#/about`, `/#/view/step-01`.
-
-### Integrated vs standalone mode
-
-- **Integrated mode** (this repo with step sources): The build script discovers steps via git tags (`step-01`, `step-02`, …) or `step-XX` folders in the repo root. It builds each step’s app (worktree + `vite build` for tags, or build from step folders), renders `docs/agent-notes/XX.md` and `docs/prompts/step-XX.md` (or `XX.md`) to HTML, and emits `site/steps.json` and `site/step-XX/`.
-- **Standalone mode** (viewer extracted, no step sources): If no steps are found, the script generates **mock** step artifacts (`site/step-01/`, `site/step-02/`) and a mock `steps.json` so you can run and test the viewer in isolation.
-
-### Viewer layout
-
-- **Home** (`/#/`): Fetches `./steps.json`, shows a list of steps; each link goes to `/#/view/step-XX`.
-- **Step view** (`/#/view/:step`): Iframe `src` is `./<stepId>/` (relative). Docs panel loads `./<stepId>/notes.html` and `./<stepId>/prompt.html` (fallback if missing).
-- **About** (`/#/about`): Fetches `./viewer-config.json` and shows site title, assistant name, repo URL, etc.
-
-All fetches and iframe URLs use **relative paths** so the site works under GitHub Pages subpaths.
-
-### Optional: run viewer app in dev
+**Build the full static site:**
 
 ```bash
-npm run dev:viewer   # runs Vite dev server for viewer/viewer-app only
+npm run build:pages
 ```
 
-Integrated testing should use the **built** `site/` served statically (`npm run preview:pages`), not the dev server.
+**Preview the full static site:**
+
+```bash
+npm run preview:pages
+```
+
+This serves `_site/` (e.g. with `npx serve _site`). Open the URL shown to verify the viewer and step content.
 
 ---
 
-## GitHub Pages
+## 3. Viewer-only workflow
 
-When this repository is pushed to GitHub and GitHub Pages is enabled with
-**GitHub Actions** as the source, the workflow at
-`.github/workflows/pages.yml` builds each step's Vue app and deploys them.
+For UI development without step artifacts:
 
-### How it works
+- `npm run dev:viewer` — run the Vue dev server
+- `npm run build:viewer` — build only the SPA to `viewer-app/dist/`
+- `npm run preview:viewer` — preview the SPA build
 
-1. All `step-*` tags are discovered.
-2. Each tag is checked out into a temporary `git worktree`.
-3. The Vue app is built with Vite, with assets under `/<repo>/step-XX/app/`.
-4. The built output is deployed via `actions/deploy-pages`.
-
-Each step is available at `/<repo>/step-XX/app/` (e.g. `/experiment-genai-steps-cursor/step-01/app/`).
-
-To deploy the **viewer** to Pages, point the workflow at the output of `npm run build:pages` (the `site/` folder) instead of the current step-app-only build.
-
-### Enabling GitHub Pages
-
-In your repository settings:
-1. Go to **Settings → Pages**.
-2. Set **Source** to **GitHub Actions**.
-3. Push to `main` (or trigger the workflow manually via **Actions →
-   Deploy to GitHub Pages → Run workflow**).
+These do **not** include `steps.json`, step folders, or `viewer-config.json`. Use `build:pages` and `preview:pages` for the complete site.
 
 ---
 
-## Repository structure
+## 4. What `build:pages` produces
 
-```
-.github/
-  workflows/
-    pages.yml         # CI/CD: build + deploy to GitHub Pages
+`_site/` contains:
 
-viewer/               # Standalone viewer (can be extracted to its own repo)
-  viewer-app/         # Vue 3 + Vite viewer app (PrimeVue, hash routing)
-  scripts/            # Build script and lib (build-pages.mjs, lib/*.js)
-  templates/          # Fallback HTML for missing notes/prompt
+| Path | Description |
+|------|-------------|
+| `index.html` + assets | Viewer UI (Vite build) |
+| `steps.json` | Step list and metadata |
+| `viewer-config.json` | Branding/config (from `viewer.config.json` at repo root) |
+| `step-XX/` | One folder per step |
+| `step-XX/index.html` | Step artifact (app or static page) |
+| `step-XX/notes.html` | Optional notes (when present) |
+| `step-XX/prompt.html` | Optional prompt (when present) |
 
-viewer.config.json    # Viewer config (site title, footer, etc.); created if missing
-site/                 # Generated static output (do not commit)
-
-src/                  # Vue 3 application source (experiment app)
-  data/
-  components/
-  views/
-  i18n/
-  router/
-  main.js
-  App.vue
-
-docs/
-  agent-notes/        # AI reasoning notes per step (XX.md)
-  prompts/            # Original prompts per step (XX.md / step-XX.md)
-```
+**GitHub Pages:** Publish the contents of `_site/` (standalone repo) or `viewer/_site/` (consumer repo after vendoring). Do **not** publish only the SPA `dist/` — the build script checks that `index.html`, `steps.json`, `viewer-config.json`, and at least one `step-*/index.html` exist and exits with an error if not.
 
 ---
 
-## Git tag convention
+## 5. Consumer repo contract (for subtree)
 
-Each major step is tagged as `step-XX` (zero-padded, e.g. `step-01`):
+After vendoring this repo into a consumer repo (e.g. under `viewer/`):
 
-```bash
-git checkout step-03   # see the codebase at step 03
-git tag -l 'step-*'    # list all step tags
+**Scripts the consumer should expose:**
+
+- `build:pages` → run the viewer’s full build (e.g. `node viewer/scripts/build-pages.mjs`)
+- Optional: `preview:pages` → serve the built site (e.g. `npx serve viewer/_site`)
+
+**Recommended consumer `package.json` snippet:**
+
+```json
+{
+  "scripts": {
+    "build:pages": "node viewer/scripts/build-pages.mjs",
+    "preview:pages": "npx serve viewer/_site"
+  }
+}
 ```
+
+**Config:** The consumer repo should provide `viewer.config.json` at **its repo root** (site title, assistant name, repo URL, etc.). The build reads it and writes `viewer/_site/viewer-config.json` at build time.
+
+---
+
+## 6. GitHub Actions template
+
+An example workflow is included in this repo:
+
+- **[examples/github-pages-workflow.yml](examples/github-pages-workflow.yml)**
+
+It:
+
+- Uses Node 20, runs `npm ci` (root) and `npm ci --prefix viewer-app`, then `npm run build:pages`
+- Uploads the Pages artifact from `_site` (standalone)
+
+**For a consumer repo:** After vendoring, change the artifact path in the workflow to `viewer/_site` so GitHub Pages publishes the viewer’s built site from the correct directory.
+
+---
+
+## 7. Subtree notes
+
+- **Add** the viewer as a subtree (e.g. `viewer` branch → `viewer/` in your repo):  
+  `git subtree add --prefix=viewer <viewer-repo-url> main --squash`  
+  (adjust branch and prefix as needed.)
+
+- **Update** from upstream:  
+  `git subtree pull --prefix=viewer <viewer-repo-url> main --squash`
+
+This repo is the **source of truth** for the viewer; consumer repos pull in changes via subtree and only need to wire `build:pages` and, if desired, the example workflow (with `viewer/_site` as the artifact path).

@@ -1,23 +1,17 @@
 {
-  "name": "experiment-genai-steps",
+  "name": "genai-viewer",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "GenAI incremental experiment viewer — static site builder and Vue 3 app",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "build:pages": "node viewer/scripts/build-pages.mjs",
-    "preview:pages": "npx serve site",
-    "dev:viewer": "npm --prefix viewer/viewer-app run dev"
+    "dev:viewer": "npm --prefix viewer-app run dev",
+    "build:viewer": "npm --prefix viewer-app run build",
+    "preview:viewer": "npm --prefix viewer-app run preview",
+    "build:pages": "node scripts/build-pages.mjs",
+    "preview:pages": "npx serve _site"
   },
   "dependencies": {
-    "vue": "^3.5",
-    "vue-router": "^4.5"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-vue": "^5.2",
-    "markdown-it": "^14.1.1",
-    "vite": "^6.1"
+    "markdown-it": "^14.0.0"
   }
 }

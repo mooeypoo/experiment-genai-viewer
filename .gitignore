@@ -1,6 +1,30 @@
-node_modules
-dist
-*.local
-_site
-_site_*
-site
+# Dependencies
+node_modules/
+
+# Build output
+_site/
+dist/
+
+# Git worktrees used by build (integrated mode)
+.wt-*/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local env
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~

@@ -1,9 +1,9 @@
 {
-  "siteTitle": "GenAI Incremental Localization Experiment (Cursor / Sonnet)",
-  "assistantName": "Cursor / Sonnet",
-  "repoUrl": "https://github.com/mooeypoo/experiment-genai-localization",
+  "siteTitle": "GenAI Incremental Experiment Viewer",
+  "assistantName": "",
+  "repoUrl": "",
   "otherExperimentUrl": "",
   "footerName": "Moriel Schottlender",
   "footerUrl": "https://moriel.tech",
-  "description": "Step viewer for an incremental software development experiment."
+  "description": ""
 }
