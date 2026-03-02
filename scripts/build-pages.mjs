@@ -53,10 +53,13 @@ let stepsData = []
 if (hasIntegratedSteps()) {
   log('Integrated mode: building step artifacts from repo.')
   const stepIds = discoverSteps()
-  const pagesURL = viewerConfig.pagesURL ?? ''
+  const buildOptions = {
+    pagesURL: viewerConfig.pagesURL ?? '',
+    stepNamesFromTagDescriptions: !!viewerConfig.stepNamesFromTagDescriptions,
+  }
   for (const stepId of stepIds) {
     log(`  Building ${stepId}...`)
-    const meta = buildStep(stepId, SITE_DIR, { pagesURL })
+    const meta = buildStep(stepId, SITE_DIR, buildOptions)
     if (meta) {
       stepsData.push(meta)
     }

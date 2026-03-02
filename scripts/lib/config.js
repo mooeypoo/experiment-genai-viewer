@@ -18,6 +18,8 @@ const DEFAULTS = {
   description: '',
   /** Base path for step pages when deployed (e.g. "" for root, "/viewer" for subpath). Empty = preview/root. */
   pagesURL: '',
+  /** When true, step titles come from git tag descriptions; when false or unset, from agent notes H1 */
+  stepNamesFromTagDescriptions: false,
 }
 
 export function loadViewerConfig() {

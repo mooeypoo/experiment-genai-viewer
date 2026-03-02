@@ -75,6 +75,17 @@ function discoverFromManifest() {
   }
 }
 
+/** Get the tag description (first line of message) for an annotated tag; empty for lightweight tags. */
+function getTagDescription(stepId) {
+  try {
+    const out = execSync(`git tag -l --format='%(contents:subject)' ${stepId}`, { cwd: REPO_ROOT, encoding: 'utf-8' })
+    const desc = out.trim()
+    return desc || null
+  } catch {
+    return null
+  }
+}
+
 const VITE_CONFIG_NAMES = ['vite.config.js', 'vite.config.mjs', 'vite.config.ts']
 
 /**
@@ -193,7 +204,10 @@ function buildStepFromTag(stepId, stepOutDir, options = {}) {
     const promptPathA = join(worktree, 'docs', 'prompts', `step-${num}.md`)
     const promptPathB = join(worktree, 'docs', 'prompts', `${num}.md`)
 
-    let title = `Step ${num.padStart(2, '0')}`
+    const useTagDescription = !!options.stepNamesFromTagDescriptions
+    const tagDesc = useTagDescription ? getTagDescription(stepId) : null
+    const stepLabel = `Step ${num.padStart(2, '0')}`
+    let title = tagDesc ? `${stepLabel}: ${tagDesc}` : stepLabel
     let hasNotes = false
     let hasPrompt = false
 
@@ -215,10 +229,12 @@ function buildStepFromTag(stepId, stepOutDir, options = {}) {
       if (html) {
         writeText(join(stepOutDir, 'notes.html'), wrapProse(html))
         hasNotes = true
-        const h1 = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)
-        if (h1 && h1[1]) {
-          const raw = h1[1].replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').trim()
-          if (raw) title = raw
+        if (!useTagDescription) {
+          const h1 = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)
+          if (h1 && h1[1]) {
+            const raw = h1[1].replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').trim()
+            if (raw) title = raw
+          }
         }
       }
     }
