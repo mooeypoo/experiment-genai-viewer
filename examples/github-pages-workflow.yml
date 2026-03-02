@@ -40,6 +40,8 @@ jobs:
         run: npm ci --prefix viewer-app
 
       - name: Build full static site
+        env:
+          VIEWER_PAGES_URL: /${{ github.event.repository.name }}
         run: npm run build:pages
 
       - name: Upload artifact
