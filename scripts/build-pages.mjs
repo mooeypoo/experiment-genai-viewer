@@ -24,7 +24,7 @@ function log(msg) {
 }
 
 function run(cmd, args, cwd) {
-  const r = spawnSync(cmd, args, { cwd: cwd || REPO_ROOT, stdio: 'inherit', shell: true })
+  const r = spawnSync(cmd, args, { cwd: cwd || REPO_ROOT, stdio: 'inherit', shell: false })
   if (r.status !== 0) {
     process.exit(r.status ?? 1)
   }
