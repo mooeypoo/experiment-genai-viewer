@@ -1,0 +1,88 @@
+/* Viewer base styles — minimal, consistent with Vuetify */
+:root {
+  --viewer-bg: #f8fafc;
+  --viewer-border: #e2e8f0;
+  --viewer-text: #1e293b;
+  --viewer-muted: #64748b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: var(--font-family), system-ui, sans-serif;
+  background: var(--viewer-bg);
+  color: var(--viewer-text);
+}
+
+#app {
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#app .v-application {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Focus visible for accessibility */
+:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Docs panel content — flexible width, wrap everything */
+.viewer-prose {
+  padding: 1rem;
+  line-height: 1.6;
+  font-size: 0.9375rem;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-x: auto;
+}
+
+.viewer-prose h1 { font-size: 1.25rem; margin-top: 0; overflow-wrap: anywhere; word-break: break-word; }
+.viewer-prose h2 { font-size: 1.1rem; margin-top: 1rem; overflow-wrap: anywhere; word-break: break-word; }
+.viewer-prose h3 { font-size: 1rem; overflow-wrap: anywhere; word-break: break-word; }
+.viewer-prose p { margin: 0.5rem 0; overflow-wrap: anywhere; word-break: break-word; }
+.viewer-prose li { overflow-wrap: anywhere; word-break: break-word; }
+.viewer-prose ul, .viewer-prose ol { margin: 0.5rem 0; padding-left: 1.5rem; }
+.viewer-prose pre, .viewer-prose code { font-family: ui-monospace, monospace; font-size: 0.875em; }
+.viewer-prose pre {
+  background: var(--viewer-border);
+  padding: 0.75rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  max-width: 100%;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.viewer-prose code { word-break: break-all; overflow-wrap: anywhere; }
+.viewer-prose table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+.viewer-prose table td,
+.viewer-prose table th {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.viewer-missing {
+  color: var(--viewer-muted);
+  font-style: italic;
+}

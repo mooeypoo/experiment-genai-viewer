@@ -1,0 +1,17 @@
+{
+  "name": "genai-viewer",
+  "private": true,
+  "version": "1.0.0",
+  "description": "GenAI incremental experiment viewer — static site builder and Vue 3 app",
+  "type": "module",
+  "scripts": {
+    "dev:viewer": "npm --prefix viewer-app run dev",
+    "build:viewer": "npm --prefix viewer-app run build",
+    "preview:viewer": "npm --prefix viewer-app run preview",
+    "build:pages": "node scripts/build-pages.mjs",
+    "preview:pages": "npx serve _site"
+  },
+  "dependencies": {
+    "markdown-it": "^14.0.0"
+  }
+}
