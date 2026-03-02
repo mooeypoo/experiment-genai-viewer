@@ -40,6 +40,10 @@ run('npx', ['vite', 'build', '--outDir', SITE_DIR], VIEWER_APP_DIR)
 
 // ─── Viewer config ─────────────────────────────────────────────────────────
 const viewerConfig = loadViewerConfig()
+// Allow CI (e.g. GitHub Actions) to set pages base path; leave empty locally for preview.
+if (process.env.VIEWER_PAGES_URL != null && process.env.VIEWER_PAGES_URL !== '') {
+  viewerConfig.pagesURL = process.env.VIEWER_PAGES_URL
+}
 writeJson(join(SITE_DIR, 'viewer-config.json'), viewerConfig)
 log('Emitted viewer-config.json')
 
@@ -49,9 +53,10 @@ let stepsData = []
 if (hasIntegratedSteps()) {
   log('Integrated mode: building step artifacts from repo.')
   const stepIds = discoverSteps()
+  const pagesURL = viewerConfig.pagesURL ?? ''
   for (const stepId of stepIds) {
     log(`  Building ${stepId}...`)
-    const meta = buildStep(stepId, SITE_DIR)
+    const meta = buildStep(stepId, SITE_DIR, { pagesURL })
     if (meta) {
       stepsData.push(meta)
     }

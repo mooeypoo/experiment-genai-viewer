@@ -16,6 +16,8 @@ const DEFAULTS = {
   footerName: 'Moriel Schottlender',
   footerUrl: 'https://moriel.tech',
   description: '',
+  /** Base path for step pages when deployed (e.g. "" for root, "/viewer" for subpath). Empty = preview/root. */
+  pagesURL: '',
 }
 
 export function loadViewerConfig() {

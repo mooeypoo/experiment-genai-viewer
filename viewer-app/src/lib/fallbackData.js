@@ -17,4 +17,5 @@ export const DEFAULT_VIEWER_CONFIG = {
   footerName: '',
   footerUrl: '',
   description: 'Step viewer for an incremental software development experiment.',
+  pagesURL: '',
 }

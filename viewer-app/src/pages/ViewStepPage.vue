@@ -34,6 +34,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import StepFrame from '@/components/StepFrame.vue'
 import { normalizeStepId } from '@/lib/stepId'
+import { stepPageUrl } from '@/lib/stepPageUrl'
 import { state } from '@/lib/state'
 import { fetchSteps } from '@/lib/api'
 import { setSteps } from '@/lib/state'
@@ -60,9 +61,46 @@ function goToStepById(id) {
 async function checkStepExists() {
   if (!normalizedId.value) return
   try {
-    const res = await fetch(`./${normalizedId.value}/index.html`, { method: 'head' })
+    const res = await fetch(stepPageUrl(normalizedId.value))
+    // #region agent log
+    fetch('http://127.0.0.1:7244/ingest/9f288287-f024-4eb3-aace-8008d47f7795', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: `log_${Date.now()}_checkStepExists_ok`,
+        timestamp: Date.now(),
+        location: 'ViewStepPage.vue:checkStepExists',
+        message: 'checkStepExists fetch result',
+        runId: 'pre-fix',
+        hypothesisId: 'H1',
+        data: {
+          stepId: normalizedId.value,
+          url: stepPageUrl(normalizedId.value),
+          status: res.status,
+          ok: res.ok,
+        },
+      }),
+    }).catch(() => {})
+    // #endregion agent log
     stepExists.value = res.ok
   } catch {
+    // #region agent log
+    fetch('http://127.0.0.1:7244/ingest/9f288287-f024-4eb3-aace-8008d47f7795', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: `log_${Date.now()}_checkStepExists_error`,
+        timestamp: Date.now(),
+        location: 'ViewStepPage.vue:checkStepExists',
+        message: 'checkStepExists fetch error',
+        runId: 'pre-fix',
+        hypothesisId: 'H1',
+        data: {
+          stepId: normalizedId.value,
+        },
+      }),
+    }).catch(() => {})
+    // #endregion agent log
     stepExists.value = false
   }
 }
